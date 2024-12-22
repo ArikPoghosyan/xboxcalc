@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xbox Game Pass Ultimate Calculator</title>
+    <script>
+        // JavaScript function to dynamically change the labels and button text
+        function updateLabels() {
+            var unit = document.getElementById('unit').value;
+            var daysLabel = document.getElementById('daysLabel');
+            var submitButton = document.getElementById('submitButton');
+
+            if (unit === 'months') {
+                daysLabel.innerHTML = 'Months Remaining:';
+                submitButton.innerHTML = 'Calculate Ultimate Months'; // Change button text for months
+            } else {
+                daysLabel.innerHTML = 'Days Remaining:';
+                submitButton.innerHTML = 'Calculate Ultimate Days'; // Change button text for days
+            }
+        }
+
+        // Call the updateLabels function when the page loads, to set the initial values
+        window.onload = function() {
+            updateLabels();
+        };
+    </script>
+</head>
+<body>
+    <h1>Xbox Game Pass Ultimate Conversion Calculator</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="subscription">Current Subscription:</label>
+        <select id="subscription" name="subscription" required>
+            <option value="core" {% if subscription == 'core' %}selected{% endif %}>Game Pass Core</option>
+            <option value="pc" {% if subscription == 'pc' %}selected{% endif %}>PC Game Pass</option>
+            <option value="standard" {% if subscription == 'standard' %}selected{% endif %}>Standard/Console Game Pass</option>
+            <option value="ea" {% if subscription == 'ea' %}selected{% endif %}>EA Play</option>
+        </select>
+        <br><br>
+
+        <!-- Dynamically changing label for Days/Months -->
+        <label id="daysLabel" for="days">Days Remaining:</label>
+        <input type="number" id="days" name="days" required value="{{ days }}">
+        <br><br>
+
+        <label for="unit">Time Unit:</label>
+        <select id="unit" name="unit" required onchange="updateLabels()">
+            <option value="days" {% if unit == 'days' %}selected{% endif %}>Days</option>
+            <option value="months" {% if unit == 'months' %}selected{% endif %}>Months</option>
+        </select>
+        <br><br>
+        
+        <!-- Dynamically changing the submit button text -->
+        <button type="submit" id="submitButton">Calculate Ultimate Days</button>
+    </form>
+
+    <!-- Display the result if available -->
+    {% if result is not None %}
+    <h2>Conversion Result:</h2>
+    {% if unit == "months" %}
+        <p>If you buy 1 month of Ultimate, your total Ultimate months will be: <strong>{{ result|floatformat:2 }}</strong> month{% if result != 1 %}s{% endif %}</p>
+    {% else %}
+        <p>If you buy 1 month of Ultimate, your total Ultimate days will be: <strong>{{ result }}</strong> day{% if result != 1 %}s{% endif %}</p>
+    {% endif %}
+    
+    
+{% endif %}
+
+
+
+
+</body>
+</html>
